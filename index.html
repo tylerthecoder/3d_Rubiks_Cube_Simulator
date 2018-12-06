@@ -9,16 +9,15 @@
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<script src="cube.js"></script>
 	<script src="piece.js"></script>
+	<script src="face.js"></script>
 </head>
 
-<body onkeydown="Cube.handleKeys(event)">
-	<h1 id="timeDis" align="center"></h1>
+<body>
+	<h1 id="timeDis"></h1>
 	<Cube id="cube"></Cube>
 	<script>
-		let Cube = new C();
-		Cube.generate();
+		let c = new C();
+		c.generate();
 	</script>
-
-	<script src="tutorial.js"></script>
 </body>
 </html>
