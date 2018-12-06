@@ -2,8 +2,8 @@ class C {
 	constructor() {
 		this.settings = {
 			timer:2, //0 means none, 1 means lesiure time, 2 means competition timer
-			opaque:true, //toggles on and off the opacity
-			turnSpeed:0.1,
+			opaque: false, //toggles on and off the opacity
+			turnSpeed: 0.1,
 			scrammbleSpeed:0.05,
 			animate: true,
 			cubeSize: 100
@@ -69,9 +69,7 @@ class C {
 		mainLoop:
 		while(indices[0] < 10) {
 			if (failsafe++ > 1000) break;
-			const f = [];
-			const colors = [];
-			//const stickers = [];
+			const stickers = [];
 			for (let i in faces) {
 				if (indices[i] >= faces[i].depth) {
 					// we are on the last index of the last thing
@@ -80,16 +78,22 @@ class C {
 					indices[Number(i)+1]++;
 				}
 				if (faces[i].isEdge(indices[i])) {
-					f.push(faceNames[i]);
-					colors.push(faces[i].getColor(indices[i]))
+					const sticker = {
+						color: faces[i].getColor(indices[i]),
+						face: String(faceNames[i]),
+						dir: indices[i] == 0 ? 1 : -1 // if it is the front or back
+					}
+					stickers.push(sticker)
 				}
 			}
-			if (colors.length === 0) {
+			if (stickers.length === 0) {
 				indices[0]++;
 				continue;
 			}
 			this.html.innerHTML += `<cubie id='cubie${count}'></cubie>`;
-			const piece = new p(colors, f, count, this, {
+
+			console.log(indices.join(''))
+			const piece = new p(stickers, count, this, {
 				x: indices[0],
 				y: indices[1],
 				z: indices[2]
@@ -113,11 +117,6 @@ class C {
 		const [ cFace, cDepths, cDirection ] = t;
 		const f = this.faces[cFace.toLocaleLowerCase()];
 
-		// using slice to copy the swaps
-		const swaps = f.swaps.slice(0);
-		if (cDirection === -1) {
-			swaps.reverse()
-		}
 		let angle = cDirection == 1 ? 90 : -90;
 
 		// dont know why this is necessary!!
@@ -149,7 +148,7 @@ class C {
 
 		for (const pieceIndex of this.inFace) {
 			face.appendChild(document.getElementById("cubie" + pieceIndex))
-			this.p[pieceIndex].rotate(swaps, t)
+			this.p[pieceIndex].rotate(t)
 		}
 		setTimeout(() => {
 			if (this.settings.animate) {

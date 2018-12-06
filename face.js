@@ -5,12 +5,6 @@ class Face {
     this.colors = colors;
     this.cube = cube;
     this.axis = this.side == "x" ? "z" : this.side == "y" ?  "x": "y";
-
-    const sides = "xyz".replace(this.side, "").split('');
-    this.swaps = sides
-                  .map(s => s + '0')
-                  .concat(sides.map(s => s + String(this.depth-1)))
-
   }
 
   getTransform(layer) {
@@ -18,9 +12,9 @@ class Face {
 		return `translate${this.axis}(${translate}px)`;
   }
 
-  getRotate(layer) {
+  getRotate(dir) {
     const rotateAxis = this.side == "x" ? false : this.side == "y" ? "y" : "x";
-    let translate = `translate(-50%,-50%)translate${this.axis}(${50 * (layer == 0 ? 1 : -1)}px)`;
+    let translate = `translate(-50%,-50%)translate${this.axis}(${50 * dir}px)`;
     if (rotateAxis) translate += `rotate${rotateAxis}(90deg)`;
     return translate + ';'
   }
