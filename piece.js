@@ -11,18 +11,15 @@ class p {
 	draw() {
 		this.html = document.getElementById("cubie" + this.id);
 
-		let transform = "";
-		transform += this.cube.faces.x.getTransform(this.pos.x + 1);
-		transform += this.cube.faces.y.getTransform(this.pos.y + 1);
-		transform += this.cube.faces.z.getTransform(this.pos.z + 1);
-
-		this.html.style.transform = transform;
+		this.html.style.transform = this.cube.faces.reduce((transform, face, index) => {
+			return transform + face.getTransform(this.pos[index] + 1)
+		}, "")
 
 		let html = "";
-		for (const face of 'xyz'.split('')) {
+		for (let face = 0; face < 3; face++) {
 			for (let dir = -1; dir <=1; dir += 2) {
 				const sticker = this.stickers
-												.filter(s => s.face === face && s.dir === dir)[0];
+												.filter(s => +s.face === +face && s.dir === dir)[0];
 				const backgroundColor = sticker ? sticker.color : 'black';
 
 				// don't draw black faces
@@ -39,11 +36,9 @@ class p {
 	}
 
 	rotate (t) {
-		const [ cFace, cDepths, cDirection ] = t;
-
-		const str = cDirection == 1 ? "xyz" : "zyx"
-
-		const sides = str.replace(cFace, "").split('');
+		const [ cFace, cDepths, dir ] = t;
+		const sides = [0,1,2].filter(s => s != cFace);
+		if (dir == -1) sides.reverse();
 		for (const sticker of this.stickers) {
 			if (sides.includes(sticker.face)) {
 				// go to the next sides
@@ -55,8 +50,8 @@ class p {
 			}
 		}
 
-		const x1 = "xyz".replace(cFace, "").toLocaleLowerCase().split('');
-		const x2 = cDirection == 1 ? [
+		const x1 = [0,1,2].filter(s => s != cFace);
+		const x2 = dir == 1 ? [
 			(this.cube.n-this.pos[x1[1]])-1,
 			this.pos[x1[0]]
 		] : [
@@ -65,5 +60,10 @@ class p {
 		]
 		this.pos[x1[0]] = x2[0];
 		this.pos[x1[1]] = x2[1];
+
+		// this.pos[x1[0]] = -dir * this.pos[x1[1]]
+		// this.pos[x1[1]] = dir * this.pos[x1[0]]
+		// if (this.pos[x1[0]] < 0) this.pos[x1[0]] = Math.abs(this.pos[x1[0]]) - 1
+		// if (this.pos[x1[1]] < 0) this.pos[x1[1]] = Math.abs(this.pos[x1[1]]) - 1
 	}
 }

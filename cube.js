@@ -26,33 +26,33 @@ class C {
 
 		const n = this.n
 		this.moves = {
-			"i": ['x', [1], 1],  // R
-			"k": ['x', [1], -1], // R'
-			"j": ['z', [1], 1],  // U
-			"f": ['z', [1], -1], // U'
-			"h": ['y', [1], 1],  // F
-			"g": ['y', [1], -1], // F'
-			"d": ['x', [n], 1],  // L
-			"e": ['x', [n], -1], // L'
-			"s": ['z', [n], 1],  // D
-			"l": ['z', [n], -1], // D'
-			"w": ['y', [n], 1],  // B
-			"o": ['y', [n], -1], // B'
-			"8": ['x', [2], 1],  // M
-			"n": ['y', [2], 1],  // E
-			"-": ['z', [2], 1],  // S
-			"y": ['x', [1,2,3], 1],  // X
-			"b": ['x', [1,2,3], -1], // X'
-			";": ['z', [1,2,3], 1],  // Y
-			"a": ['z', [1,2,3], -1], // Y'
-			"p": ['y', [1,2,3], 1],  // Z
+			"i": [0, [1], 1],  // R
+			"k": [0, [1], -1], // R'
+			"j": [2, [1], 1],  // U
+			"f": [2, [1], -1], // U'
+			"h": [1, [1], 1],  // F
+			"g": [1, [1], -1], // F'
+			"d": [0, [n], 1],  // L
+			"e": [0, [n], -1], // L'
+			"s": [2, [n], 1],  // D
+			"l": [2, [n], -1], // D'
+			"w": [1, [n], 1],  // B
+			"o": [1, [n], -1], // B'
+			"8": [0, [2], 1],  // M
+			"n": [1, [2], 1],  // E
+			"-": [2, [2], 1],  // S
+			"y": [0, [1,2,3], 1],  // X
+			"b": [0, [1,2,3], -1], // X'
+			";": [2, [1,2,3], 1],  // Y
+			"a": [2, [1,2,3], -1], // Y'
+			"p": [1, [1,2,3], 1],  // Z
 		}
 
-		this.faces = {
-			x: new Face('x', this.n, ['red', 'orange'], this),
-			y: new Face('y', this.n, ['blue', 'green'], this),
-			z: new Face('z', this.n, ['yellow', 'white'], this)
-		}
+		this.faces = [
+			new Face(0, this.n, ['red', 'orange'], this),
+			new Face(1, this.n, ['blue', 'green'], this),
+			new Face(2, this.n, ['yellow', 'white'], this)
+		]
 
 		document.body.onkeydown = (event) => { this.handleKeys(event) };
 	}
@@ -62,25 +62,24 @@ class C {
 		this.html.innerHTML = "<div id='theFace'></div>";
 		const indices = [0, 0, 0];
 
-		const faces = Object.values(this.faces)
-		const faceNames = Object.keys(this.faces)
 
 		let failsafe = 0;
 		mainLoop:
 		while(indices[0] < 10) {
 			if (failsafe++ > 1000) break;
 			const stickers = [];
-			for (let i in faces) {
-				if (indices[i] >= faces[i].depth) {
+			for (let i = 0; i < this.faces.length; i++) {
+				const face = this.faces[i];
+				if (indices[i] >= face.depth) {
 					// we are on the last index of the last thing
-					if (i == faces.length-1) break mainLoop;
+					if (i == this.faces.length-1) break mainLoop;
 					indices[i] = 0;
-					indices[Number(i)+1]++;
+					indices[i+1]++;
 				}
-				if (faces[i].isEdge(indices[i])) {
+				if (face.isEdge(indices[i])) {
 					const sticker = {
-						color: faces[i].getColor(indices[i]),
-						face: String(faceNames[i]),
+						color: face.getColor(indices[i]),
+						face: i,
 						dir: indices[i] == 0 ? 1 : -1 // if it is the front or back
 					}
 					stickers.push(sticker)
@@ -93,11 +92,11 @@ class C {
 			this.html.innerHTML += `<cubie id='cubie${count}'></cubie>`;
 
 			console.log(indices.join(''))
-			const piece = new p(stickers, count, this, {
-				x: indices[0],
-				y: indices[1],
-				z: indices[2]
-			});
+			const piece = new p(stickers, count, this, [
+				indices[0],
+				indices[1],
+				indices[2]
+			]);
 			this.p.push(piece);
 			count++;
 			indices[0]++;
@@ -115,12 +114,12 @@ class C {
 	turn (t) {
 		// ['Y', [1], 1]
 		const [ cFace, cDepths, cDirection ] = t;
-		const f = this.faces[cFace.toLocaleLowerCase()];
+		const f = this.faces[cFace];
 
 		let angle = cDirection == 1 ? 90 : -90;
 
 		// dont know why this is necessary!!
-		if (cFace == "y") angle *= -1;
+		if (cFace == 1) angle *= -1;
 
 		//put the pieces in a face, turn that face, draw the new position of the pieces, then destroy the face.
 		if (this.settings.animate) this.draw(false);
@@ -139,7 +138,7 @@ class C {
 			const other = [];
 			for (let i in this.p) {
 				const piece = this.p[i];
-				if (piece.pos[cFace.toLocaleLowerCase()] === depth - 1) {
+				if (piece.pos[cFace] === depth - 1) {
 					other.push(i);
 				}
 			}

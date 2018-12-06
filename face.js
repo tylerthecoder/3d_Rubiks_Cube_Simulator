@@ -4,7 +4,7 @@ class Face {
     this.depth = depth;
     this.colors = colors;
     this.cube = cube;
-    this.axis = this.side == "x" ? "z" : this.side == "y" ?  "x": "y";
+    this.axis = this.side == 0 ? "z" : this.side == 1 ?  "x": "y";
   }
 
   getTransform(layer) {
@@ -13,7 +13,7 @@ class Face {
   }
 
   getRotate(dir) {
-    const rotateAxis = this.side == "x" ? false : this.side == "y" ? "y" : "x";
+    const rotateAxis = this.side == 0 ? false : this.side == 1 ? "y" : "x";
     let translate = `translate(-50%,-50%)translate${this.axis}(${50 * dir}px)`;
     if (rotateAxis) translate += `rotate${rotateAxis}(90deg)`;
     return translate + ';'
