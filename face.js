@@ -1,10 +1,11 @@
 class Face {
-  constructor(side, depth, colors, cube) {
+  constructor(side, depth, colors, keys, cube) {
     this.side = side;
     this.depth = depth;
     this.colors = colors;
     this.cube = cube;
-    this.axis = this.side == 0 ? "z" : this.side == 1 ?  "x": "y";
+    this.axis = ["z", "x", "y"][this.side];
+    this.keys = keys;
   }
 
   getTransform(layer) {
@@ -13,7 +14,7 @@ class Face {
   }
 
   getRotate(dir) {
-    const rotateAxis = this.side == 0 ? false : this.side == 1 ? "y" : "x";
+    const rotateAxis = [false, "y", "x"][this.side];
     let translate = `translate(-50%,-50%)translate${this.axis}(${50 * dir}px)`;
     if (rotateAxis) translate += `rotate${rotateAxis}(90deg)`;
     return translate + ';'
@@ -31,5 +32,50 @@ class Face {
     }
   }
 
+  turn(layers, dir) {
+    let angle = dir == 1 ? 90 : -90;
+		// dont know why this is necessary!!
+    if (this.side == 1) angle *= -1;
 
+    this.cube.emptyFaces();
+
+    const face = document.getElementById("theFace")
+
+		face.style.transition = "transform 0s";
+		face.style.transform = "";
+
+		// get all the pieces on all the faces that are sent in the request
+    this.cube.inFace = this.cube.p
+             .filter(p => layers.includes(p.pos[this.side]))
+
+		for (const p of this.cube.inFace) {
+			face.appendChild(document.getElementById("cubie" + p.id));
+			p.rotate(this.side, dir);
+    }
+    const moveSpeed =  ((this.cube.state == "scrammbling") ? this.cube.settings.scrammbleSpeed:this.cube.settings.turnSpeed);
+		setTimeout(() => {
+			if (this.cube.settings.animate) {
+				face.style.transition = `transform ${moveSpeed}s`
+				face.style.transform = `rotate${this.axis}(${angle}deg)`;
+				face.addEventListener("transitionend", () => {
+					this.cube.emptyFaces()
+				})
+			}
+		},1)
+  }
+
+  keyPress(key, num) {
+    if (!num || num == 0) num = 1; // move at least one layer
+    const index = this.keys.indexOf(key);
+    if (index == -1) return false;
+    let layer = ~~(index/2);
+    const layers =
+      layer == 0 ? Array.from(Array(num)).map((_, i) => i) :
+      layer == 1 ? Array.from(Array(this.depth - 2)).map((_,i) => i+1) :
+      layer == 2 ? Array.from(Array(num)).map((_,i) => (this.depth-1) - i) :
+      layer == 3 ? Array.from(Array(this.depth)).map((_,i) => i) : [];
+    const dir = index % 2 == 0 ? 1 : -1;
+    this.turn(layers, dir);
+    return true;
+  }
 }

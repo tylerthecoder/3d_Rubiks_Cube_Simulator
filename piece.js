@@ -17,9 +17,8 @@ class p {
 
 		let html = "";
 		for (let face = 0; face < 3; face++) {
-			for (let dir = -1; dir <=1; dir += 2) {
-				const sticker = this.stickers
-												.filter(s => +s.face === +face && s.dir === dir)[0];
+			for (let dir = -1; dir <= 1; dir += 2) {
+				const sticker = this.stickers.filter(s => s.face === face && s.dir === dir)[0];
 				const backgroundColor = sticker ? sticker.color : 'black';
 
 				// don't draw black faces
@@ -35,9 +34,8 @@ class p {
 		for (let i in this.html.children) if (this.html.children[i].innerHTML) this.html.children[i].style.opacity = (this.cube.settings.opaque) ? 1:0.7;
 	}
 
-	rotate (t) {
-		const [ cFace, cDepths, dir ] = t;
-		const sides = [0,1,2].filter(s => s != cFace);
+	rotate (side, dir) {
+		const sides = [0,1,2].filter(s => s != side);
 		if (dir == -1) sides.reverse();
 		for (const sticker of this.stickers) {
 			if (sides.includes(sticker.face)) {
@@ -50,13 +48,13 @@ class p {
 			}
 		}
 
-		const x1 = [0,1,2].filter(s => s != cFace);
+		const x1 = [0,1,2].filter(s => s != side);
 		const x2 = dir == 1 ? [
-			(this.cube.n-this.pos[x1[1]])-1,
+			(this.cube.faces[side].depth-this.pos[x1[1]])-1,
 			this.pos[x1[0]]
 		] : [
 			this.pos[x1[1]],
-			this.cube.n-this.pos[x1[0]]-1
+			this.cube.faces[side].depth-this.pos[x1[0]]-1
 		]
 		this.pos[x1[0]] = x2[0];
 		this.pos[x1[1]] = x2[1];

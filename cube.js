@@ -1,10 +1,10 @@
 class C {
 	constructor() {
 		this.settings = {
-			timer:2, //0 means none, 1 means lesiure time, 2 means competition timer
-			opaque: false, //toggles on and off the opacity
-			turnSpeed: 0.1,
-			scrammbleSpeed:0.05,
+			timer: 2, //0 means none, 1 means lesiure time, 2 means competition timer
+			opaque: true, //toggles on and off the opacity
+			turnSpeed: 0.3,
+			scrammbleSpeed: 0.05,
 			animate: true,
 			cubeSize: 100
 		}
@@ -20,48 +20,20 @@ class C {
 		this.timer = 0;
 		this.startTime = new Date();
 		this.endTime = new Date();
-		this.n = 2;
-
-		this.queue = [];
-
-		const n = this.n
-		this.moves = {
-			"i": [0, [1], 1],  // R
-			"k": [0, [1], -1], // R'
-			"j": [2, [1], 1],  // U
-			"f": [2, [1], -1], // U'
-			"h": [1, [1], 1],  // F
-			"g": [1, [1], -1], // F'
-			"d": [0, [n], 1],  // L
-			"e": [0, [n], -1], // L'
-			"s": [2, [n], 1],  // D
-			"l": [2, [n], -1], // D'
-			"w": [1, [n], 1],  // B
-			"o": [1, [n], -1], // B'
-			"8": [0, [2], 1],  // M
-			"n": [1, [2], 1],  // E
-			"-": [2, [2], 1],  // S
-			"y": [0, [1,2,3], 1],  // X
-			"b": [0, [1,2,3], -1], // X'
-			";": [2, [1,2,3], 1],  // Y
-			"a": [2, [1,2,3], -1], // Y'
-			"p": [1, [1,2,3], 1],  // Z
-		}
+		this.dim = [3,3,3];
 
 		this.faces = [
-			new Face(0, this.n, ['red', 'orange'], this),
-			new Face(1, this.n, ['blue', 'green'], this),
-			new Face(2, this.n, ['yellow', 'white'], this)
+			new Face(0, this.dim[0], ['red', 'orange'], "ik8 deyb", this), // RL face
+			new Face(1, this.dim[1], ['blue', 'green'], "hgn wop ", this),
+			new Face(2, this.dim[2], ['yellow', 'white'], "jf- sl;a", this)
 		]
 
 		document.body.onkeydown = (event) => { this.handleKeys(event) };
 	}
 
 	generate () {
-		let count = 0;
 		this.html.innerHTML = "<div id='theFace'></div>";
 		const indices = [0, 0, 0];
-
 
 		let failsafe = 0;
 		mainLoop:
@@ -89,16 +61,10 @@ class C {
 				indices[0]++;
 				continue;
 			}
-			this.html.innerHTML += `<cubie id='cubie${count}'></cubie>`;
+			this.html.innerHTML += `<cubie id='cubie${this.p.length}'></cubie>`;
 
-			console.log(indices.join(''))
-			const piece = new p(stickers, count, this, [
-				indices[0],
-				indices[1],
-				indices[2]
-			]);
+			const piece = new p(stickers, this.p.length, this, indices.slice(0));
 			this.p.push(piece);
-			count++;
 			indices[0]++;
 		}
 
@@ -111,50 +77,11 @@ class C {
 		this.p.forEach(p => p.draw());
 	}
 
-	turn (t) {
-		// ['Y', [1], 1]
-		const [ cFace, cDepths, cDirection ] = t;
-		const f = this.faces[cFace];
-
-		let angle = cDirection == 1 ? 90 : -90;
-
-		// dont know why this is necessary!!
-		if (cFace == 1) angle *= -1;
-
-		//put the pieces in a face, turn that face, draw the new position of the pieces, then destroy the face.
-		if (this.settings.animate) this.draw(false);
-
-		for (let i of this.inFace) {
-			this.html.appendChild(document.getElementById("cubie" + i));
+	emptyFaces() {
+		for (let p of this.inFace) {
+			this.html.appendChild(document.getElementById("cubie" + p.id));
 		}
-
-		const face = document.getElementById("theFace")
-
-		face.style.transition = "transform 0s";
-		face.style.transform = "";
-
-		// get all the pieces on all the faces that are sent in the request
-		this.inFace = cDepths.flatMap(depth => {
-			const other = [];
-			for (let i in this.p) {
-				const piece = this.p[i];
-				if (piece.pos[cFace] === depth - 1) {
-					other.push(i);
-				}
-			}
-			return other;
-		})
-
-		for (const pieceIndex of this.inFace) {
-			face.appendChild(document.getElementById("cubie" + pieceIndex))
-			this.p[pieceIndex].rotate(t)
-		}
-		setTimeout(() => {
-			if (this.settings.animate) {
-				face.style.transition = "transform " + ((this.state == "scrammbling") ? this.settings.scrammbleSpeed:this.settings.turnSpeed) + "s"
-				face.style.transform = "rotate" + f.axis + "(" + angle + "deg)";
-			}
-		},1)
+		this.draw();
 	}
 
 	scramble() {
@@ -197,7 +124,6 @@ class C {
 			if (this.state == "timerRunning" && this.isSolved()) this.stopTimer()
 			timeDis.innerHTML = ((new Date()) - this.startTime)/1000;
 		}, 10);
-
 	}
 
 	stopTimer () {
@@ -211,9 +137,11 @@ class C {
 		this.yDeg += (key == "ArrowLeft") ? 5:(key=="ArrowRight") ? -5:0;
 		this.xDeg += (key == "ArrowUp") ? 5:(key=="ArrowDown") ? -5:0;
 		this.zDeg += (key == "PageUp") ? 5:(key=="PageDown") ? -5:0;
-		this.draw(true)
-		if (key in this.moves) {
-			this.turn(this.moves[key])
+		this.draw(true);
+
+		if (+key) this.lastNum = +key;
+		for (const f of this.faces) {
+			if (f.keyPress(key, this.lastNum)) this.lastNum = 0;
 		}
 		if (key == "Shift" && this.state == "idle") {
 			this.scramble();
