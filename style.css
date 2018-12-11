@@ -1,11 +1,10 @@
 body {
   padding: 0px;
   margin: 0px;
+  overflow-y: hidden;
 }
 
 .sticker {
-  width: 100px;
-  height: 100px;
   box-sizing: border-box;
   border: 2px black solid;
   position: absolute;
@@ -14,6 +13,11 @@ body {
 
 #theFace {
   transform-style: preserve-3d;
+}
+
+#time {
+  text-align: center;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 Cube {

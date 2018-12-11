@@ -10,14 +10,16 @@
 	<script src="cube.js"></script>
 	<script src="piece.js"></script>
 	<script src="face.js"></script>
+	<script src="timer.js"></script>
 </head>
 
 <body>
-	<h1 id="timeDis"></h1>
+	<h1 id="time"></h1>
 	<Cube id="cube"></Cube>
 	<script>
-		let c = new C();
+		const c = new Cube();
 		c.generate();
+		const timer = new Timer(c);
 	</script>
 </body>
 </html>
