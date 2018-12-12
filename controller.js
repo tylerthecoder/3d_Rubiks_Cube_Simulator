@@ -1,4 +1,4 @@
-class Timer {
+class Controller {
   constructor(c) {
     this.settings = {
       // -1 means that there is no inspection time
@@ -11,6 +11,7 @@ class Timer {
     this.cube = c;
     this.cubeState = 0;
     document.body.addEventListener("keydown", (e) => this.keyDown(e));
+    document.body.addEventListener("keyup", (e) => this.keyup(e));
   }
 
   async scramble() {
@@ -75,6 +76,23 @@ class Timer {
   }
 
   keyDown(event) {
-    if (event.key === "Shift") this.scramble()
+    const key = event.key;
+    if (+key) this.numPress = +key;
+    if (key === "Shift") this.scramble();
+
+    this.cube.deg[0] += key === "ArrowUp" ? 5 : key === "ArrowDown" ? -5 : 0;
+		this.cube.deg[1] += key === "ArrowLeft" ? 5 : key === "ArrowRight" ? -5 : 0;
+    this.cube.deg[2] += key === "PageUp" ? 5 : key === "PageDown" ? -5 : 0;
+    this.cube.draw();
+
+    if (key != " ") {
+      for (const f of this.cube.faces) {
+        f.keyPress(key, this.numPress);
+      }
+    }
+  }
+
+  keyup() {
+    if (+event.key) this.numPress = null;
   }
 }
