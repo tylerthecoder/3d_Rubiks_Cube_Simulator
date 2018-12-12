@@ -1,59 +1,64 @@
 class p {
-	constructor(colors, faces, id, cube) {
-		this.stickers = [];
-		this.faces = [];
-		for (let i in colors) {
-			if (colors[i] !== "") this.stickers.push(colors[i])
-		}
-		for (let i in faces) {
-			if (faces[i]) this.faces.push(faces[i])
-		}
+	constructor(stickers, id, cube, pos, dim) {
+		this.pos = pos;
+		this.stickers = stickers;
 		this.id = id;
 		this.cube = cube;
 		this.html = "";
+		this.dim = dim;
 		this.draw();
 	}
 
 	draw() {
-		let transform = "";
-		this.html = document.getElementById("cubie" + this.id)
-		for (let i of this.faces) {
-			transform += this.cube.faces[i.toString()].translate;
-		}
-		
-		this.html.style.transform = transform;
-		
+		this.html = document.getElementById("cubie" + this.id);
+
+		this.html.style.transform = this.cube.faces.reduce((transform, face, index) => {
+			return transform + face.getTransform(this.pos[index] + 1, this.dim[index])
+		}, "")
+
 		let html = "";
-		for (let i in this.cube.faces) {
-			if (this.cube.faces[i].isMiddle) continue;
-			if (this.faces.indexOf(i) > -1) {
-				let style = "style='transform:translate(-50%,-50%)" + this.cube.faces[i].rotate + 
-						";background-color:" + this.cube.colors[this.stickers[this.faces.indexOf(i)]].color + "'";
-				html += "<div " + style + " class='sticker' ><h1></h1></div>"
-			}else {
-				if (!this.cube.settings.opaque) continue;
-				let style = "style='transform:translate(-50%,-50%)" + this.cube.faces[i].rotate + ";background-color:black'";
-				html += "<div " + style + " class='sticker' ><h1></h1></div>"
+		for (let face = 0; face < 3; face++) {
+			for (let dir = -1; dir <= 1; dir += 2) {
+				const sticker = this.stickers.filter(s => s.face === face && s.dir === dir)[0];
+				const backgroundColor = sticker ? sticker.color : 'black';
+
+				// don't draw black faces
+				if (!sticker && !this.cube.settings.opaque) continue;
+				const rotate = this.cube.faces[face].getRotate(dir)
+				const styleString = `transform:${rotate};background-color:${backgroundColor};width:${this.cube.settings.cubeSize}px;height:${this.cube.settings.cubeSize}px;opacity:${this.cube.settings.opaque ? 1 : 0.7}`
+				html += `<div style=${styleString} class='sticker'></div>`
 			}
 		}
 		this.html.innerHTML = html;
-		
-		//set opacity of the pieces
-		for (let i in this.html.children) if (this.html.children[i].innerHTML) this.html.children[i].style.opacity = (this.cube.settings.opaque) ? 1:0.7;
 	}
-	
-	rotate (swaps) {
-		swaps = swaps.split("");
-		let newFaces = [];
-		for (let i in this.faces) {
-			if (swaps.indexOf(this.faces[i]) !== -1) {
-				let j = swaps.indexOf(this.faces[i]);
-				newFaces.push(swaps[(j+1)%4]);
-			}else {
-				newFaces.push(this.faces[i])
+
+	rotate (side, dir) {
+		const sides = [0,1,2].filter(s => s != side);
+		if (dir == -1) sides.reverse();
+		for (const sticker of this.stickers) {
+			if (sides.includes(sticker.face)) {
+				// go to the next sides
+				const index = sides.indexOf(sticker.face);
+				sticker.face = sides[(index+1)%2];
+				if (index+1 == 2) {
+					sticker.dir *= -1;
+				}
 			}
 		}
-		this.faces = newFaces;
+
+		const x1 = [0,1,2].filter(s => s != side);
+		const x2 = dir == 1 ? [
+			(this.dim[x1[1]]-this.pos[x1[1]])-1,
+			this.pos[x1[0]]
+		] : [
+			this.pos[x1[1]],
+			this.dim[x1[0]]-this.pos[x1[0]]-1
+		]
+		this.pos[x1[0]] = x2[0];
+		this.pos[x1[1]] = x2[1];
+
+		const temp = this.dim[x1[0]];
+		this.dim[x1[0]] = this.dim[x1[1]];
+		this.dim[x1[1]] = temp;
 	}
-	
 }
