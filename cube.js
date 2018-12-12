@@ -11,8 +11,6 @@ class Cube {
 		this.html = document.getElementById("cube");
 		this.inFace = [];
 		this.onTurn = () => {};
-
-		document.body.onkeydown = (event) => { this.handleKeys(event) };
 	}
 
 	generate () {
@@ -20,7 +18,7 @@ class Cube {
 		this.faces = [
 			new Face(0, this.settings.dim[0], ['red', 'orange'], "ik8 edyb", this), // RL face
 			new Face(1, this.settings.dim[1], ['blue', 'green'], "ghn wop ", this),
-			new Face(2, this.settings.dim[2], ['yellow', 'white'], "jf- sl;a", this) // UB face
+			new Face(2, this.settings.dim[2], ['yellow', 'white'], "jf- ls;a", this) // UB face
 		]
 
 		this.html.innerHTML = "<div id='theFace'></div>";
@@ -95,20 +93,5 @@ class Cube {
 			}
 		}
 		return true;
-	}
-
-	handleKeys (e) {
-		let key = e.key
-		this.deg[0] += (key == "ArrowUp") ? 5:(key=="ArrowDown") ? -5:0;
-		this.deg[1] += (key == "ArrowLeft") ? 5:(key=="ArrowRight") ? -5:0;
-		this.deg[2] += (key == "PageUp") ? 5:(key=="PageDown") ? -5:0;
-
-		this.draw();
-
-		if (+key) this.lastNum = +key;
-		for (const f of this.faces) {
-			if (f.keyPress(key, this.lastNum)) this.lastNum = 0;
-		}
-
 	}
 }
