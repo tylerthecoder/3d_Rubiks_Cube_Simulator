@@ -25,14 +25,11 @@ class p {
 				// don't draw black faces
 				if (!sticker && !this.cube.settings.opaque) continue;
 				const rotate = this.cube.faces[face].getRotate(dir)
-				const styleString = `transform:${rotate};background-color:${backgroundColor};width:${this.cube.settings.cubeSize}px;height:${this.cube.settings.cubeSize}px`
+				const styleString = `transform:${rotate};background-color:${backgroundColor};width:${this.cube.settings.cubeSize}px;height:${this.cube.settings.cubeSize}px;opacity:${this.cube.settings.opaque ? 1 : 0.7}`
 				html += `<div style=${styleString} class='sticker'></div>`
 			}
 		}
 		this.html.innerHTML = html;
-
-		//set opacity of the pieces
-		for (let i in this.html.children) if (this.html.children[i].innerHTML) this.html.children[i].style.opacity = (this.cube.settings.opaque) ? 1:0.7;
 	}
 
 	rotate (side, dir) {
@@ -63,10 +60,5 @@ class p {
 		const temp = this.dim[x1[0]];
 		this.dim[x1[0]] = this.dim[x1[1]];
 		this.dim[x1[1]] = temp;
-
-		// this.pos[x1[0]] = -dir * this.pos[x1[1]]
-		// this.pos[x1[1]] = dir * this.pos[x1[0]]
-		// if (this.pos[x1[0]] < 0) this.pos[x1[0]] = Math.abs(this.pos[x1[0]]) - 1
-		// if (this.pos[x1[1]] < 0) this.pos[x1[1]] = Math.abs(this.pos[x1[1]]) - 1
 	}
 }

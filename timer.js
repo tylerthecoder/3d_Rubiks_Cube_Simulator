@@ -1,10 +1,9 @@
 class Timer {
   constructor(c) {
     this.settings = {
-      // 0 means timer starts immediately
       // -1 means that there is no inspection time
       // otherwise it is just time in seconds
-      inspectionTime: 0,
+      inspectionTime: 15,
       turnsPerScramble: 50,
       scrambleSpeed: 0.01,
       showScrambleAnimation: false
@@ -49,7 +48,6 @@ class Timer {
   }
 
   startInspection() {
-    console.log()
     const startTime = new Date();
     this.inspectionTimer = setInterval(() => {
       const currentTime = new Date();
@@ -79,6 +77,4 @@ class Timer {
   keyDown(event) {
     if (event.key === "Shift") this.scramble()
   }
-
-
 }
