@@ -44,6 +44,7 @@ class Controller {
 
       if (this.cubeState == 2 && this.cube.isSolved()) {
         clearInterval(this.timer);
+        this.cubeState = 0;
       }
     }
   }
@@ -78,7 +79,7 @@ class Controller {
   keyDown(event) {
     const key = event.key;
     if (+key) this.numPress = +key;
-    if (key === "Shift") this.scramble();
+    if (key === "Shift" && this.cubeState === 0) this.scramble();
 
     this.cube.deg[0] += key === "ArrowUp" ? 5 : key === "ArrowDown" ? -5 : 0;
 		this.cube.deg[1] += key === "ArrowLeft" ? 5 : key === "ArrowRight" ? -5 : 0;
