@@ -17,7 +17,7 @@
 	<h1 id="time"></h1>
 	<button onclick="openSettings()">Settings</button>
 	<div id="settingsDiv">
-		Size: <input type="number" id="size"/> <br>
+		Size: <input type="number" id="size" /> <br>
 		Turn Speed: <input type="number" id="turnSpeed" step=".1" /> <br>
 		Animate: <input type="checkbox" id="animate" /> <br>
 		Cube Size: <input type="text" id="cubeSize" /> <br>
@@ -28,12 +28,13 @@
 		<button onclick="document.getElementById('settingsDiv').style.display = 'none'"> Cancel </button>
 	</div>
 	<Cube id="cube"></Cube>
+	<Cube id="cube"></Cube>
 	<script>
 		const c = new Cube();
 		c.generate();
 		const timer = new Controller(c);
 
-		function openSettings () {
+		function openSettings() {
 			document.getElementById("settingsDiv").style.display = "block";
 			document.getElementById("size").value = c.settings.dim[0];
 			document.getElementById("turnSpeed").value = c.settings.turnSpeed;
@@ -44,7 +45,7 @@
 			document.getElementById("inspectionTime").value = timer.settings.inspectionTime;
 		}
 
-		function updateSettings () {
+		function updateSettings() {
 			document.getElementById("settingsDiv").style.display = "none";
 			const size = Number(document.getElementById("size").value);
 			c.settings.dim = [size, size, size];
@@ -52,9 +53,11 @@
 			c.settings.animate = Boolean(document.getElementById("animate").checked);
 			c.settings.cubeSize = Number(document.getElementById("cubeSize").value);
 			c.settings.opaque = document.getElementById("opaque").checked;
-			timer.settings.inspectionTime = document.getElementById("inspection").checked ? document.getElementById("inspectionTime").value : -1;
+			timer.settings.inspectionTime = document.getElementById("inspection").checked ? document.getElementById(
+				"inspectionTime").value : -1;
 			c.generate()
 		}
 	</script>
 </body>
+
 </html>

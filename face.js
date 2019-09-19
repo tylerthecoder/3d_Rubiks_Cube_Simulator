@@ -9,8 +9,8 @@ class Face {
   }
 
   getTransform(layer, n) {
-    const translate = this.cube.settings.cubeSize/2 * (n - 1) - (layer - 1) * this.cube.settings.cubeSize;
-		return `translate${this.axis}(${translate}px)`;
+    const translate = this.cube.settings.cubeSize / 2 * (n - 1) - (layer - 1) * this.cube.settings.cubeSize;
+    return `translate${this.axis}(${translate}px)`;
   }
 
   getRotate(dir) {
@@ -45,7 +45,7 @@ class Face {
 
     // get all the pieces on all the faces that are sent in the request
     this.cube.inFace = this.cube.p
-            .filter(p => layers.includes(p.pos[this.side]))
+      .filter(p => layers.includes(p.pos[this.side]))
 
     const face = document.getElementById("theFace")
 
@@ -67,7 +67,7 @@ class Face {
         } else {
           this.cube.emptyFaces();
         }
-      },1)
+      }, 1)
     })
   }
 
@@ -75,12 +75,12 @@ class Face {
     if (!num || num == 0) num = 1; // move at least one layer
     const index = this.keys.indexOf(key);
     if (index == -1) return false;
-    let layer = ~~(index/2);
+    let layer = ~~(index / 2);
     const layers =
       layer == 0 ? Array.from(Array(num)).map((_, i) => i) :
-      layer == 1 ? Array.from(Array(this.depth - 2)).map((_,i) => i+1) :
-      layer == 2 ? Array.from(Array(num)).map((_,i) => (this.depth-1) - i) :
-      layer == 3 ? Array.from(Array(this.depth)).map((_,i) => i) : [];
+      layer == 1 ? Array.from(Array(this.depth - 2)).map((_, i) => i + 1) :
+      layer == 2 ? Array.from(Array(num)).map((_, i) => (this.depth - 1) - i) :
+      layer == 3 ? Array.from(Array(this.depth)).map((_, i) => i) : [];
     const dir = index % 2 == 0 ? 1 : -1;
     this.turn(layers, dir);
     return true;
