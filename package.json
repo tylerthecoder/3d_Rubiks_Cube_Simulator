@@ -1,0 +1,24 @@
+{
+  "name": "3d_rubiks_cube_simulator",
+  "version": "1.0.0",
+  "description": "A Pure HTML, CSS, and Javascript Rubik's Cube simulator that can be controlled via the keyboard;",
+  "main": "controller.js",
+  "scripts": {
+    "start": "google-chrome localhost:8000",
+    "serve": "python -m SimpleHTTPServer 8000",
+    "dev": "npm-run-all --parallel start serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tylerthecoder/3d_Rubiks_Cube_Simulator.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tylerthecoder/3d_Rubiks_Cube_Simulator/issues"
+  },
+  "homepage": "https://github.com/tylerthecoder/3d_Rubiks_Cube_Simulator#readme",
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}
